@@ -100,6 +100,12 @@ const Footer = () => {
               >
                 {t("footer.contact", "Contact")}
               </Link>
+              <Link
+                to="/api-docs"
+                className="hover:text-blue-650 dark:hover:text-blue-450 transition-colors duration-200"
+              >
+                API Docs
+              </Link>
               <a
                 href="https://github.com/imuniqueshiv/MeetOnMemory"
                 target="_blank"
@@ -261,6 +267,14 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link
+                  to="/api-docs"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block font-medium"
+                >
+                  Developer API
+                </Link>
+              </li>
+              <li>
                 <a
                   href="https://github.com/imuniqueshiv/MeetOnMemory"
                   target="_blank"
@@ -354,6 +368,10 @@ const Footer = () => {
               <span>•</span>
               <Link to="/security" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 {t("footer.security", "Security")}
+              </Link>
+              <span>•</span>
+              <Link to="/api-docs" className="hover:text-blue-650 dark:hover:text-blue-450 transition-colors">
+                API Docs
               </Link>
               <span>•</span>
               <Link to="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
