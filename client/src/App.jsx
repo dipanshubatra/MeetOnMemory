@@ -1,380 +1,420 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useLocation } from "react-router-dom";
+import { Github, ArrowUp } from "lucide-react";
 
-// --- Public Pages ---
-import Home from "./pages/Home.jsx"; // 👈 Public landing page
-import Login from "./pages/Login.jsx";
-import EmailVerify from "./pages/EmailVerify.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
-import PublicOrganizationProfile from "./pages/PublicOrganizationProfile.jsx";
-import Privacy from "./pages/Privacy.jsx";
-import Terms from "./pages/Terms.jsx";
-import Security from "./pages/Security.jsx";
-import Contact from "./pages/Contact.jsx";
-import Careers from "./pages/Careers.jsx";
-
-// --- Protected Pages ---
-import MeetingListPage from "./pages/MeetingListPage.jsx";
-import OrganizationHub from "./pages/OrganizationHub.jsx";
-import JoinOrganizationPage from "./pages/JoinOrganizationPage.jsx";
-import CreateOrganizationPage from "./pages/CreateOrganizationPage.jsx";
-import BrowseOrganizations from "./pages/BrowseOrganizations/BrowseOrganizations.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-
-// ✅ Newly Added Feature Pages
-import CreateMeeting from "./pages/CreateMeeting.jsx";
-import UploadMeeting from "./pages/UploadMeeting.jsx";
-import Policies from "./pages/Policies.jsx";
-import Summaries from "./pages/Summaries.jsx";
-import Reports from "./pages/Reports.jsx";
-import AiSearch from "./pages/AiSearch.jsx";
-import MeetingRoom from "./pages/MeetingRoom.jsx";
-import MeetingDetails from "./pages/MeetingDetails.jsx";
-import TeamMembers from "./pages/TeamMembers.jsx";
-import Profile from "./pages/Profile.jsx";
-import Calendar from "./pages/Calendar.jsx";
-import Notifications from "./pages/Notifications.jsx";
-import Tasks from "./pages/Tasks.jsx";
-import KnowledgeTimeline from "./pages/KnowledgeTimeline.jsx";
-import PolicyCompliance from "./pages/PolicyCompliance.jsx";
-import Settings from "./pages/Settings.jsx";
-import MembershipRequests from "./pages/MembershipRequests.jsx";
-import Navbar from "./components/Navbar";
-import ScrollNavigator from "./components/ScrollNavigator";
-
-// --- Components ---
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import Footer from "./components/Footer.jsx";
-import ErrorBoundary from "./components/ErrorBoundary.jsx";
-
-const App = () => {
+const Footer = () => {
+  const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
   const location = useLocation();
+  const isLandingPage = location.pathname === "/";
 
-  const hideFooterRoutes = ["/login"];
-  const shouldShowFooter = !hideFooterRoutes.includes(location.pathname);
-
-  // Only activate navigation controller panel when exactly on the landing page fold
-  const shouldShowScrollNavigator = location.pathname === "/";
-
-  const [isHovered, setIsHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(true);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(pointer: fine)");
-    setIsMobile(!mediaQuery.matches);
-    if (!mediaQuery.matches) return;
-
-    // Keep track of real mouse coordinates and rendering coordinates
-    const mouse = { x: 0, y: 0 };
-    const dot = { x: 0, y: 0 };
-    const ring = { x: 0, y: 0 };
-
-    // DOM references obtained directly for maximum frames-per-second performance
-    let dotEl = null;
-    let ringEl = null;
-    let animationFrameId = null;
-
-    const handleMouseMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      if (!dotEl) dotEl = document.querySelector(".custom-cursor");
-      if (!ringEl) ringEl = document.querySelector(".custom-cursor-ring");
-      if (dotEl && ringEl) {
-        dotEl.style.opacity = "1";
-        ringEl.style.opacity = "1";
-      }
-    };
-
-    const handleMouseOver = (e) => {
-      const target = e.target;
-      if (
-        target.tagName === "A" ||
-        target.tagName === "BUTTON" ||
-        target.closest("button") ||
-        target.closest("a") ||
-        target.getAttribute("role") === "button"
-      ) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
-    };
-
-    const handleMouseLeave = () => {
-      if (dotEl && ringEl) {
-        dotEl.style.opacity = "0";
-        ringEl.style.opacity = "0";
-      }
-    };
-
-    const handleMouseEnter = () => {
-      if (dotEl && ringEl) {
-        dotEl.style.opacity = "1";
-        ringEl.style.opacity = "1";
-      }
-    };
-
-    // The Tick function handles the fluid physics loop
-    const tick = () => {
-      if (!dotEl) dotEl = document.querySelector(".custom-cursor");
-      if (!ringEl) ringEl = document.querySelector(".custom-cursor-ring");
-
-      if (dotEl && ringEl) {
-        // Inner dot follows instantly (1:1 ratio)
-        dot.x = mouse.x;
-        dot.y = mouse.y;
-        dotEl.style.transform = `translate3d(${dot.x}px, ${dot.y}px, 0) translate(-50%, -50%)`;
-
-        // Outer circle glides smoothly lagging behind (using 15% interpolation speed)
-        ring.x += (mouse.x - ring.x) * 0.15;
-        ring.y += (mouse.y - ring.y) * 0.15;
-        ringEl.style.transform = `translate3d(${ring.x}px, ${ring.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      animationFrameId = requestAnimationFrame(tick);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseover", handleMouseOver);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    document.addEventListener("mouseenter", handleMouseEnter);
-    animationFrameId = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseover", handleMouseOver);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      cancelAnimationFrame(animationFrameId);
-    };
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const handleNavLink = (href) => {
+    if (href.startsWith("#")) {
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  if (!isLandingPage) {
+    return (
+      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Left: Brand logo & Copyright */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4">
+              <Link to="/" className="flex items-center gap-2 group">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  className="w-6 h-6 transition-transform duration-300 group-hover:scale-105"
+                >
+                  <defs>
+                    <linearGradient
+                      id="compactInfinityGrad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="#2563eb" />
+                      <stop offset="100%" stopColor="#7c3aed" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M25,50 C25,35 38,30 50,50 C62,70 75,65 75,50 C75,35 62,30 50,50 C38,70 25,65 25,50 Z"
+                    fill="none"
+                    stroke="url(#compactInfinityGrad)"
+                    strokeWidth="11"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="25" cy="50" r="6.5" fill="#2563eb" />
+                  <circle cx="75" cy="50" r="6.5" fill="#7c3aed" />
+                </svg>
+                <span className="font-bold text-sm text-gray-900 dark:text-gray-100 tracking-tight">
+                  MeetOn
+                  <span className="text-blue-600 dark:text-blue-400">
+                    Memory
+                  </span>
+                </span>
+              </Link>
+              <span className="hidden sm:inline text-gray-300 dark:text-gray-600">
+                |
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                &copy; {currentYear} MeetOnMemory. {t("footer.allRightsReserved")}
+              </span>
+              <span className="px-2 py-0.5 text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-full">
+                v1.0.0
+              </span>
+            </div>
+
+            {/* Right: Links & Back to Top */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <Link
+                to="/privacy"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                {t("footer.privacy")}
+              </Link>
+              <Link
+                to="/terms"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                {t("footer.terms")}
+              </Link>
+              <Link
+                to="/security"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                {t("footer.security", "Security")}
+              </Link>
+              <Link
+                to="/cookie-policy"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                Cookies
+              </Link>
+              <Link
+                to="/contact"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                {t("footer.contact", "Contact")}
+              </Link>
+              <Link
+                to="/careers"
+                className="hover:text-blue-650 dark:hover:text-blue-450 transition-colors duration-200"
+              >
+                Careers
+              </Link>
+              <a
+                href="https://github.com/imuniqueshiv/MeetOnMemory"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                <Github className="w-3.5 h-3.5" />
+                GitHub
+              </a>
+              <button
+                onClick={scrollToTop}
+                className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group"
+                aria-label="Scroll back to top"
+              >
+                <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+                {t("footer.backToTop")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
-      <ErrorBoundary>
-        {/* Toast Notifications */}
-        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+          {/* Column 1: Project Info */}
+          <div className="flex flex-col gap-4 lg:col-span-1">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center">
+                {/* Clean Native Option A Infinity Symbol tuned for Footer Sizing */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  className="w-10 h-10 transition-transform duration-300"
+                >
+                  <defs>
+                    <linearGradient
+                      id="footerInfinityGrad"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="#2563eb" />
+                      <stop offset="100%" stopColor="#7c3aed" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M25,50 C25,35 38,30 50,50 C62,70 75,65 75,50 C75,35 62,30 50,50 C38,70 25,65 25,50 Z"
+                    fill="none"
+                    stroke="url(#footerInfinityGrad)"
+                    strokeWidth="11"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="25" cy="50" r="6.5" fill="#2563eb" />
+                  <circle cx="75" cy="50" r="6.5" fill="#7c3aed" />
+                </svg>
+              </div>
+              <span className="font-bold text-xl text-gray-900 dark:text-gray-100 tracking-tight">
+                MeetOn
+                <span className="text-blue-600 dark:text-blue-400">Memory</span>
+              </span>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-sm font-medium leading-snug">
+              {t("hero.badge")}
+            </p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed">
+              {t("footer.description")}
+            </p>
+            {/* GitHub social link */}
+            <a
+              href="https://github.com/imuniqueshiv/MeetOnMemory"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="MeetOnMemory GitHub repository"
+              className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200 mt-1 group w-fit"
+            >
+              <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              {t("footer.meetOnMemoryTeam")}
+            </a>
+          </div>
 
-        <Routes>
-          {/* === Public Routes (No login required) === */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/email-verify" element={<EmailVerify />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route
-            path="/organizations/:slug"
-            element={<PublicOrganizationProfile />}
-          />
+          {/* Column 2: Quick Links */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
+              {t("footer.product")}
+            </h3>
+            <ul className="flex flex-col gap-3">
+              <li>
+                <Link
+                  to="/"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNavLink("#features")}
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
+                  aria-label="Scroll to Features section"
+                >
+                  {t("navbar.features")}
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNavLink("#how-it-works")}
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
+                  aria-label="Scroll to How It Works section"
+                >
+                  {t("navbar.howItWorks")}
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleNavLink("#about")}
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block text-left"
+                  aria-label="Scroll to About section"
+                >
+                  {t("navbar.about")}
+                </button>
+              </li>
+              <li>
+                <Link
+                  to="/dashboard"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  {t("navbar.dashboard")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/login"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  {t("navbar.login")}
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-          {/* === Protected Routes (Require login) === */}
-          <Route
-            path="/meetings"
-            element={
-              <ProtectedRoute resource="meetings" action="view">
-                <MeetingListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/knowledge/:decisionId"
-            element={
-              <ProtectedRoute>
-                <KnowledgeTimeline />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/organizations"
-            element={
-              <ProtectedRoute>
-                <OrganizationHub />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/join-organization"
-            element={
-              <ProtectedRoute>
-                <JoinOrganizationPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/browse-organizations"
-            element={
-              <ProtectedRoute>
-                <BrowseOrganizations />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-organization"
-            element={
-              <ProtectedRoute>
-                <CreateOrganizationPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          {/* Column 3: Resources */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
+              {t("footer.company")}
+            </h3>
+            <ul className="flex flex-col gap-3">
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block font-medium"
+                >
+                  Contact Support
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/careers"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block font-medium"
+                >
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/imuniqueshiv/MeetOnMemory"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="MeetOnMemory GitHub repository (opens in new tab)"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  GitHub Repository
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/imuniqueshiv/MeetOnMemory/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Report issues on GitHub (opens in new tab)"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  Report Issues
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/imuniqueshiv/MeetOnMemory/blob/main/CONTRIBUTING.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Contributing guide (opens in new tab)"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  Contributing
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/imuniqueshiv/MeetOnMemory/blob/main/CODE_OF_CONDUCT.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Code of Conduct (opens in new tab)"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 inline-block"
+                >
+                  Code of Conduct
+                </a>
+              </li>
+            </ul>
+          </div>
 
-          {/* ✅ Newly Added Dashboard Feature Routes */}
-          <Route
-            path="/create-meeting"
-            element={
-              <ProtectedRoute resource="meetings" action="create">
-                <CreateMeeting />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/upload-meeting"
-            element={
-              <ProtectedRoute resource="meetings" action="create">
-                <UploadMeeting />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/policies"
-            element={
-              <ProtectedRoute resource="policies" action="view">
-                <Policies />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/summaries"
-            element={
-              <ProtectedRoute resource="meetings" action="view">
-                <Summaries />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute resource="reports" action="view">
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/ai-search"
-            element={
-              <ProtectedRoute resource="ai_search" action="search">
-                <AiSearch />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/meeting-room/:roomId" element={<MeetingRoom />} />
-          <Route
-            path="/meeting/:id"
-            element={
-              <ProtectedRoute resource="meetings" action="view">
-                <MeetingDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/team-members"
-            element={
-              <ProtectedRoute resource="team_members" action="view">
-                <TeamMembers />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <ProtectedRoute resource="calendar" action="view">
-                <Calendar />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute resource="notifications" action="view">
-                <Notifications />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <ProtectedRoute resource="tasks" action="view">
-                <Tasks />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/policy-compliance"
-            element={
-              <ProtectedRoute resource="policies" action="view">
-                <PolicyCompliance />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute resource="settings" action="view">
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/membership-requests"
-            element={
-              <ProtectedRoute resource="team_members" action="invite">
-                <MembershipRequests />
-              </ProtectedRoute>
-            }
-          />
+          {/* Column 4: Built with */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-5">
+              {t("footer.getInTouch")}
+            </h3>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                "React",
+                "Node.js",
+                "Express",
+                "MongoDB",
+                "Google Gemini",
+                "Pinecone",
+              ].map((tech) => (
+                <li
+                  key={tech}
+                  className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-linear-to-br from-blue-600 to-violet-600 flex-shrink-0"
+                    aria-hidden="true"
+                  />
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
-          {/* ✅ Fallback route — send unknown routes to Home */}
-          <Route path="*" element={<Home />} />
-        </Routes>
+        {/* Bottom bar */}
+        <div className="pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1">
+            <p className="text-gray-400 dark:text-gray-500 text-sm">
+              &copy; {currentYear} MeetOnMemory. {t("footer.allRightsReserved")}
+            </p>
+            <span className="hidden sm:inline text-gray-300 dark:text-gray-700">|</span>
+            <div className="flex items-center gap-3 text-xs font-medium text-gray-400 dark:text-gray-500">
+              <Link to="/privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {t("footer.privacy")}
+              </Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {t("footer.terms")}
+              </Link>
+              <span>•</span>
+              <Link to="/security" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {t("footer.security", "Security")}
+              </Link>
+              <span>•</span>
+<Link
+  to="/careers"
+  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+>
+  Careers
+</Link>
 
-        {/* Floating Section Controller overlay */}
-        {shouldShowScrollNavigator && <ScrollNavigator />}
+<span>•</span>
 
-        {/* Global Footer */}
-        {shouldShowFooter && <Footer />}
-
-        {!isMobile && (
-          <>
-            <div className={`custom-cursor ${isHovered ? "hovered" : ""}`} />
-            <div
-              className={`custom-cursor-ring ${isHovered ? "hovered" : ""}`}
-            />
-          </>
-        )}
-      </ErrorBoundary>
-    </div>
+<Link
+  to="/cookie-policy"
+  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+>
+  Cookies
+</Link>
+              </Link>
+              <span>•</span>
+              <Link to="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                {t("footer.contact", "Contact")}
+              </Link>
+            </div>
+          </div>
+          <p className="text-gray-400 dark:text-gray-500 text-sm">
+            {t("footer.madeWith")} ❤️ {t("footer.by")} {t("footer.meetOnMemoryTeam")}.
+          </p>
+          {/* Back to top */}
+          <button
+            onClick={scrollToTop}
+            aria-label="Scroll back to top"
+            className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md px-1"
+          >
+            <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform duration-200" />
+            {t("footer.backToTop")}
+          </button>
+        </div>
+      </div>
+    </footer>
   );
 };
 
-export default App;
+export default Footer;
+
