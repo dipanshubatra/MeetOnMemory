@@ -14,6 +14,7 @@ import Terms from "./pages/Terms.jsx";
 import Security from "./pages/Security.jsx";
 import Contact from "./pages/Contact.jsx";
 import Status from "./pages/Status.jsx";
+import CookiePolicy from "./pages/CookiePolicy.jsx";
 
 // --- Protected Pages ---
 import MeetingListPage from "./pages/MeetingListPage.jsx";
@@ -38,6 +39,7 @@ import Calendar from "./pages/Calendar.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Tasks from "./pages/Tasks.jsx";
 import KnowledgeTimeline from "./pages/KnowledgeTimeline.jsx";
+import MemoryConsolidation from "./pages/MemoryConsolidation.jsx";
 import PolicyCompliance from "./pages/PolicyCompliance.jsx";
 import Settings from "./pages/Settings.jsx";
 import MembershipRequests from "./pages/MembershipRequests.jsx";
@@ -167,7 +169,8 @@ const App = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/security" element={<Security />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/status" element={<Status />} />
+<Route path="/status" element={<Status />} />
+<Route path="/cookie-policy" element={<CookiePolicy />} />
           <Route
             path="/organizations/:slug"
             element={<PublicOrganizationProfile />}
@@ -187,6 +190,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <KnowledgeTimeline />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/knowledge/consolidate"
+            element={
+              <ProtectedRoute resource="knowledge" action="view">
+                <MemoryConsolidation />
               </ProtectedRoute>
             }
           />
