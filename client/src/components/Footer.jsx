@@ -95,6 +95,12 @@ const Footer = () => {
                 {t("footer.security", "Security")}
               </Link>
               <Link
+                to="/cookie-policy"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                Cookies
+              </Link>
+              <Link
                 to="/contact"
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
@@ -370,8 +376,21 @@ const Footer = () => {
                 {t("footer.security", "Security")}
               </Link>
               <span>•</span>
-              <Link to="/api-docs" className="hover:text-blue-650 dark:hover:text-blue-450 transition-colors">
-                API Docs
+<Link
+  to="/cookie-policy"
+  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+>
+  Cookies
+</Link>
+
+<span>•</span>
+
+<Link
+  to="/api-docs"
+  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+>
+  API Docs
+</Link>
               </Link>
               <span>•</span>
               <Link to="/contact" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
