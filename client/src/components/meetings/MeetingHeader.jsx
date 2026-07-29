@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Clock,
   Users,
@@ -7,7 +7,9 @@ import {
   NotebookPen,
   Captions,
   FileText,
-} from "lucide-react";
+  Calendar,
+} from 'lucide-react'
+import { exportMeetingToICal } from '../../utils/calendarExportUtils'
 
 export default function MeetingHeader({
   roomId,
@@ -22,11 +24,11 @@ export default function MeetingHeader({
   setShowTranscript,
 }) {
   const formatTime = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hrs > 0 ? hrs + ":" : ""}${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
+    const hrs = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${hrs > 0 ? hrs + ':' : ''}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
 
   return (
     <div className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-20 shrink-0">
@@ -44,28 +46,43 @@ export default function MeetingHeader({
         </div>
       </div>
 
-      <button
-        onClick={copyLink}
-        className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
-      >
-        <Copy size={16} />
-        <span className="hidden sm:inline">Copy Link</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={copyLink}
+          className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
+        >
+          <Copy size={16} />
+          <span className="hidden sm:inline">Copy Link</span>
+        </button>
+
+        <button
+          onClick={() =>
+            exportMeetingToICal({
+              title: `Meeting Room: ${roomId}`,
+              description: `MeetOnMemory room: ${roomId}`,
+              location: window.location.href,
+            })
+          }
+          className="text-gray-300 hover:text-white flex items-center gap-1.5 text-sm font-semibold bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
+          title="Export to iCalendar (.ics)"
+        >
+          <Calendar size={16} />
+          <span className="hidden sm:inline">iCal</span>
+        </button>
+      </div>
 
       {/* Notes Toggle */}
       <button
         onClick={() => setShowNotes((v) => !v)}
         className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer ${
           showNotes
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+            : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700'
         }`}
-        title={showNotes ? "Hide notes" : "Open collaborative notes"}
+        title={showNotes ? 'Hide notes' : 'Open collaborative notes'}
       >
         {showNotes ? <PanelRightClose size={16} /> : <NotebookPen size={16} />}
-        <span className="hidden sm:inline">
-          {showNotes ? "Hide Notes" : "Notes"}
-        </span>
+        <span className="hidden sm:inline">{showNotes ? 'Hide Notes' : 'Notes'}</span>
       </button>
 
       {/* Transcription Toggle */}
@@ -73,19 +90,13 @@ export default function MeetingHeader({
         onClick={toggleTranscription}
         className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer ${
           transcriptionEnabled
-            ? "bg-green-600 text-white hover:bg-green-700"
-            : "bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+            ? 'bg-green-600 text-white hover:bg-green-700'
+            : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700'
         }`}
-        title={
-          transcriptionEnabled
-            ? "Stop transcription"
-            : "Start live transcription"
-        }
+        title={transcriptionEnabled ? 'Stop transcription' : 'Start live transcription'}
       >
         <Captions size={16} />
-        <span className="hidden sm:inline">
-          {transcriptionEnabled ? "Stop" : "Captions"}
-        </span>
+        <span className="hidden sm:inline">{transcriptionEnabled ? 'Stop' : 'Captions'}</span>
       </button>
 
       {/* Transcript Toggle */}
@@ -93,16 +104,14 @@ export default function MeetingHeader({
         onClick={() => setShowTranscript((v) => !v)}
         className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer ${
           showTranscript
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+            : 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700'
         }`}
-        title={showTranscript ? "Hide transcript" : "Show transcript"}
+        title={showTranscript ? 'Hide transcript' : 'Show transcript'}
       >
         <FileText size={16} />
-        <span className="hidden sm:inline">
-          {showTranscript ? "Hide" : "Transcript"}
-        </span>
+        <span className="hidden sm:inline">{showTranscript ? 'Hide' : 'Transcript'}</span>
       </button>
     </div>
-  );
+  )
 }
